@@ -5,18 +5,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.supermarket.supermarketsystemjavafx.dao.ProductDAO;
+import org.supermarket.supermarketsystemjavafx.exceptions.DatabaseException;
 import org.supermarket.supermarketsystemjavafx.models.Product;
+import org.supermarket.supermarketsystemjavafx.services.PricingService;
+
 import java.net.URL;
 import java.sql.*;
+import java.util.List;
 import java.util.ResourceBundle;
 ;
 
@@ -49,6 +51,12 @@ public class DashboardController implements Initializable
     private Button salesButton;
 
     @FXML
+    private Button setupButton;
+
+    @FXML
+    private Tab employeesTab;
+
+    @FXML
     private Tab inventoryTab;
 
     @Override
@@ -66,32 +74,27 @@ public class DashboardController implements Initializable
         loadProductsFromDatabase();
     }
 
-    private void loadProductsFromDatabase()
-    {
-        String sql = "SELECT * FROM products";
-
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:supermarket.db");
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+    private void loadProductsFromDatabase() {
+        try {
+            List<Product> productList = ProductDAO.getAllProducts();
             products.clear();
 
-            while (rs.next()) {
-                products.add(new Product(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getDouble("price"),
-                        rs.getInt("stock"),
-                        rs.getString("category"),
-                        rs.getString("barcode")
-                ));
+            // Apply pricing logic and filter out expired products
+            for (Product product : productList) {
+                if (!PricingService.isExpired(product)) {
+                    // Ensure selling price is calculated
+                    PricingService.updateProductSellingPrice(product);
+                    products.add(product);
+                }
             }
 
             productsTable.setItems(products);
 
-        } catch (SQLException e) {
-            System.err.println("Error loading products from database: " + e.getMessage());
+        } catch (DatabaseException e) {
+            System.err.println("Error loading products: " + e.getMessage());
             e.printStackTrace();
+            // Show user-friendly alert
+            //throw("Database Error", "Failed to load products. Please try again.");
         }
     }
 
@@ -111,6 +114,72 @@ public class DashboardController implements Initializable
 
         // Set the owner to maintain window relationship
         salesStage.initOwner(salesButton.getScene().getWindow());
+
+        // Optional: Set modality if you want to block interaction with main window
+        // salesStage.initModality(Modality.WINDOW_MODAL);
+
+        salesStage.show();
+
+        // Optional: Center the new window relative to main window
+        salesStage.centerOnScreen();
+    }
+
+    @FXML
+    private void setupButtonClicked() throws IOException
+    {
+        // Load the sales view
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/org/supermarket/supermarketsystemjavafx/SetupWindow.fxml")
+        );
+        Parent root = loader.load();
+
+        // Create a new stage for the sales window
+        Stage salesStage = new Stage();
+        salesStage.setTitle("Sales Management");
+        salesStage.setScene(new Scene(root));
+
+        // Set the owner to maintain window relationship
+        salesStage.initOwner(setupButton.getScene().getWindow());
+
+        // Optional: Set modality if you want to block interaction with main window
+        // salesStage.initModality(Modality.WINDOW_MODAL);
+
+        salesStage.show();
+
+        // Optional: Center the new window relative to main window
+        salesStage.centerOnScreen();
+    }
+
+    @FXML
+    private void addButtonClicked() throws IOException
+    {
+        FXMLLoader loader;
+        // Load the sales view
+        if(inventoryTab.isSelected())
+        {
+             loader = new FXMLLoader(
+                    getClass().getResource("/org/supermarket/supermarketsystemjavafx/AddItem.fxml")
+            );
+        }
+        else if(employeesTab.isSelected())
+        {
+            loader = new FXMLLoader(
+                    getClass().getResource("/org/supermarket/supermarketsystemjavafx/AddEmployee.fxml")
+            );
+        }
+        else
+        {
+            loader = new FXMLLoader();
+        }
+        Parent root = loader.load();
+
+        // Create a new stage for the sales window
+        Stage salesStage = new Stage();
+        salesStage.setTitle("Add");
+        salesStage.setScene(new Scene(root));
+
+        // Set the owner to maintain window relationship
+        salesStage.initOwner(setupButton.getScene().getWindow());
 
         // Optional: Set modality if you want to block interaction with main window
         // salesStage.initModality(Modality.WINDOW_MODAL);

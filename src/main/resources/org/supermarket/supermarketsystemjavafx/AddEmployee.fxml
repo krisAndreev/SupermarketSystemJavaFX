@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.supermarket.supermarketsystemjavafx.controllers.AddEmployeeController"
+            prefHeight="400" prefWidth="400" style="-fx-background-color: #f5f5f5;">
+
+    <GridPane hgap="10" vgap="10" alignment="CENTER" layoutX="50" layoutY="20">
+        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+        <Label text="Add New Employee" style="-fx-font-size: 20; -fx-font-weight: bold;"
+               GridPane.columnSpan="2" GridPane.halignment="CENTER"/>
+
+        <!-- Row 1 -->
+        <Label text="Full Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="nameField" promptText="Enter employee name"
+                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <!-- Row 2 -->
+        <Label text="Monthly Salary:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="salaryField" promptText="0.00"
+                   GridPane.rowIndex="2" GridPane.columnIndex="1">
+            <GridPane.margin><Insets bottom="10"/></GridPane.margin>
+        </TextField>
+
+        <!-- Row 3 -->
+        <Label text="Position:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="positionComboBox" GridPane.rowIndex="3" GridPane.columnIndex="1">
+            <GridPane.margin><Insets bottom="10"/></GridPane.margin>
+        </ComboBox>
+
+        <!-- Row 4 -->
+        <Label text="PIN Code:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <PasswordField fx:id="pinField" promptText="4-digit PIN"
+                       GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <!-- Row 5 - Buttons -->
+        <HBox spacing="10" alignment="CENTER" GridPane.columnSpan="2" GridPane.rowIndex="5">
+            <Button fx:id="saveButton" text="Save Employee" onAction="#handleSaveEmployee"
+                    style="-fx-font-weight: bold; -fx-background-color: #2196F3; -fx-text-fill: white;"/>
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                    style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+        </HBox>
+    </GridPane>
+</AnchorPane>

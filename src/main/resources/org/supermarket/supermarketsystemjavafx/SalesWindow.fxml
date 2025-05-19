@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="560.0" prefWidth="800" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.supermarket.supermarketsystemjavafx.controllers.SalesController">
+
+    <!-- Input Section at the Top -->
+    <HBox layoutX="10" layoutY="10" spacing="10">
+        <Label prefHeight="24.0" prefWidth="64.0" style="-fx-font-weight: bold;" text="Product ID:" />
+        <TextField fx:id="productIdField" prefWidth="100" promptText="Enter ID" />
+
+        <!-- Product Name Display -->
+        <Label fx:id="productNameLabel" maxWidth="200" minWidth="200" prefHeight="23.0" prefWidth="200.0" style="-fx-font-style: italic; -fx-text-fill: #555;" text="" wrapText="true" />
+
+        <Label prefHeight="24.0" prefWidth="53.0" style="-fx-font-weight: bold;" text="Quantity:" />
+        <TextField fx:id="quantityField" prefWidth="100" promptText="Enter Qty" />
+    </HBox>
+
+    <!-- Rest of the layout remains the same -->
+    <TableView fx:id="cartTable" layoutX="10" layoutY="60" prefHeight="400" prefWidth="780">
+        <columns>
+            <TableColumn fx:id="productIdColumn" prefWidth="80" text="ID" />
+            <TableColumn fx:id="productNameColumn" prefWidth="200" text="Product Name" />
+            <TableColumn fx:id="unitPriceColumn" prefWidth="100" text="Unit Price" />
+            <TableColumn fx:id="quantityColumn" prefWidth="80" text="Qty" />
+            <TableColumn fx:id="totalPriceColumn" prefWidth="100" text="Total" />
+            <TableColumn fx:id="actionColumn" prefWidth="120" text="Action" />
+        </columns>
+    </TableView>
+
+    <HBox layoutX="10" layoutY="470" spacing="20">
+        <Label style="-fx-font-weight: bold;" text="Total Items:" />
+        <Label fx:id="totalItemsLabel" text="0" />
+
+        <Label style="-fx-font-weight: bold;" text="Grand Total:" />
+        <Label fx:id="grandTotalLabel" text="0.00" />
+    </HBox>
+
+    <HBox layoutX="10" layoutY="510" spacing="10">
+        <Button fx:id="clearButton" onAction="#handleClearCart" text="Clear Cart" />
+        <Button fx:id="finalizeButton" onAction="#handleFinalizeOrder" text="Finalize Order" />
+    </HBox>
+
+     <Button fx:id="addButton" layoutX="707.0" layoutY="10.0" onAction="#handleAddProduct" text="Add Product" />
+
+</AnchorPane>
