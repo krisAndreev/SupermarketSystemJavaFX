@@ -12,6 +12,7 @@ public class Product {
     private final ObjectProperty<LocalDate> expirationDate;
     private final IntegerProperty quantity;
     private final StringProperty barcode;
+    private final BooleanProperty selected = new SimpleBooleanProperty(false);
 
     public enum Category { FOOD, NON_FOOD }
 
@@ -36,6 +37,7 @@ public class Product {
     public ObjectProperty<LocalDate> expirationDateProperty() { return expirationDate; }
     public IntegerProperty quantityProperty() { return quantity; }
     public StringProperty barcodeProperty() { return barcode; }
+    public BooleanProperty selectedProperty() { return selected; }
 
     // Regular getters
     public int getId() { return id.get(); }
@@ -46,6 +48,7 @@ public class Product {
     public LocalDate getExpirationDate() { return expirationDate.get(); }
     public int getQuantity() { return quantity.get(); }
     public String getBarcode() { return barcode.get(); }
+    public boolean isSelected() { return selected.get(); }
 
     // Setters
     public void setId(int id) { this.id.set(id); }
@@ -56,4 +59,5 @@ public class Product {
     public void setExpirationDate(LocalDate date) { this.expirationDate.set(date); }
     public void setQuantity(int quantity) { this.quantity.set(quantity); }
     public void setBarcode(String barcode) { this.barcode.set(barcode); }
+    public void setSelected(boolean selected) { this.selected.set(selected); }
 }

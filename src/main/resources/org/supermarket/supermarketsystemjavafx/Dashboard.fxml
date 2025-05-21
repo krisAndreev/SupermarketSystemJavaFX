@@ -7,9 +7,10 @@
     <children>
         <ToolBar prefHeight="40.0" prefWidth="1089.0">
             <items>
-                <Button fx:id="addButtonClicked" mnemonicParsing="false" text="Add" onAction="#addButtonClicked"/>
+                <Button fx:id="addButtonClicked" mnemonicParsing="false" onAction="#addButtonClicked" text="Add" />
                 <Button fx:id="salesButton" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#sellButtonClicked" text="Sell" />
                 <Button fx:id="setupButton" mnemonicParsing="false" onAction="#setupButtonClicked" text="Setup" />
+                <Button fx:id="deleteSelectedButton" mnemonicParsing="false" onAction="#handleDeleteSelected" style="-fx-background-color: #ff4444; -fx-text-fill: white;" text="Delete Selected" />
             </items>
         </ToolBar>
         <Pane layoutY="40.0" prefHeight="608.0" prefWidth="1089.0">
@@ -22,17 +23,19 @@
                                     <children>
                                         <TableView fx:id="productsTable" layoutX="14.0" layoutY="14.0" prefHeight="550.0" prefWidth="1060.0">
                                             <columns>
-                                    <TableColumn prefWidth="75.0" text="SelectRow" />
-                                                <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
-                                                <TableColumn fx:id="nameColumn" prefWidth="296.0" text="Product Name" />
-                                                <TableColumn fx:id="priceColumn" prefWidth="141.0" text="Price" />
-                                                <TableColumn fx:id="stockColumn" prefWidth="126.0" text="In Stock" />
-                                                <TableColumn fx:id="categoryColumn" prefWidth="128.0" text="Category" />
-                                                <TableColumn fx:id="barcodeColumn" prefWidth="78.0" text="Barcode" />
-                                    <TableColumn prefWidth="140.0" text="DeleteRow" />
+                                                <TableColumn fx:id="selectColumn" prefWidth="24.0">
+                                                    <graphic>
+                                                        <CheckBox fx:id="selectAllCheckBox" onAction="#handleSelectAll" />
+                                                    </graphic>
+                                                </TableColumn>
+                                                <TableColumn fx:id="idColumn" prefWidth="34.0" text="№" />
+                                                <TableColumn fx:id="nameColumn" prefWidth="478.0" text="Product Name" />
+                                                <TableColumn fx:id="priceColumn" prefWidth="122.0" text="Price" />
+                                                <TableColumn fx:id="stockColumn" prefWidth="117.0" text="In Stock" />
+                                                <TableColumn fx:id="categoryColumn" prefWidth="151.0" text="Category" />
+                                                <TableColumn fx:id="barcodeColumn" prefWidth="133.0" text="Barcode" />
                                             </columns>
                                         </TableView>
-                              <ScrollBar layoutX="1075.0" layoutY="14.0" orientation="VERTICAL" prefHeight="551.0" prefWidth="14.0" />
                                         <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="574.0" spacing="10.0">
                                             <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Inventory Management" />
                                         </HBox>
