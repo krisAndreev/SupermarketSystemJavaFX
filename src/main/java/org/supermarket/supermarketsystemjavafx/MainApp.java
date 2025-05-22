@@ -7,11 +7,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.supermarket.supermarketsystemjavafx.db.DatabaseInitializer;
 
-public class MainApp extends Application {
+public class MainApp extends Application
+{
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception
+    {
         DatabaseInitializer.initialize();
-        // Use absolute path starting with /
+
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/org/supermarket/supermarketsystemjavafx/Dashboard.fxml")
         );

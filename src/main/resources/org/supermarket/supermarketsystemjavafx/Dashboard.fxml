@@ -7,7 +7,7 @@
     <children>
         <ToolBar prefHeight="40.0" prefWidth="1089.0">
             <items>
-                <Button fx:id="addButtonClicked" mnemonicParsing="false" onAction="#addButtonClicked" text="Add" />
+                <Button fx:id="addButton" mnemonicParsing="false" onAction="#addButtonClicked" text="Add" />
                 <Button fx:id="salesButton" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#sellButtonClicked" text="Sell" />
                 <Button fx:id="setupButton" mnemonicParsing="false" onAction="#setupButtonClicked" text="Setup" />
                 <Button fx:id="deleteSelectedButton" mnemonicParsing="false" onAction="#handleDeleteSelected" style="-fx-background-color: #ff4444; -fx-text-fill: white;" text="Delete Selected" />
@@ -45,7 +45,26 @@
                         </Tab>
                         <Tab fx:id="employeesTab" text="Employees">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <TableView fx:id="employeesTable" layoutX="14.0" layoutY="14.0" prefHeight="550.0" prefWidth="1060.0">
+                                            <columns>
+                                                <TableColumn fx:id="selectColumnE" prefWidth="24.0">
+                                                    <graphic>
+                                                        <CheckBox fx:id="selectAllCheckBoxE" onAction="#handleSelectAll" />
+                                                    </graphic>
+                                                </TableColumn>
+                                                <TableColumn fx:id="idColumnE" prefWidth="34.0" text="Id" />
+                                                <TableColumn fx:id="nameColumnE" prefWidth="478.0" text="Employee Name" />
+                                                <TableColumn fx:id="salaryColumnE" prefWidth="122.0" text="Salary" />
+                                                <TableColumn fx:id="pinColumnE" prefWidth="117.0" text="PIN" />
+                                            </columns>
+                                        </TableView>
+                                        <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="574.0" spacing="10.0">
+                                            <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Inventory Management" />
+                                        </HBox>
+                                    </children>
+                                </AnchorPane>
                             </content>
                         </Tab>
                     </tabs>
