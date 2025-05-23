@@ -1,13 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0"
-            fx:controller="org.supermarket.supermarketsystemjavafx.controllers.SetupController">
-</AnchorPane>
+<VBox xmlns="http://javafx.com/javafx/17.0.2"
+      xmlns:fx="http://javafx.com/fxml/1"
+      prefHeight="400.0" prefWidth="600.0"
+      spacing="20"
+      padding="$INSETS"
+      fx:controller="org.supermarket.supermarketsystemjavafx.controllers.SetupController">
+
+    <fx:define>
+        <Insets fx:id="INSETS" top="20" right="20" bottom="20" left="20"/>
+    </fx:define>
+
+    <Label text="Pricing Configuration" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+            <ColumnConstraints halignment="LEFT" minWidth="200"/>
+        </columnConstraints>
+
+        <Label text="Food Markup (%):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Spinner fx:id="foodMarkupSpinner" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                 editable="true">
+            <valueFactory>
+                <SpinnerValueFactory.DoubleSpinnerValueFactory min="0" max="500" initialValue="30" amountToStepBy="5"/>
+            </valueFactory>
+        </Spinner>
+
+        <Label text="Non-Food Markup (%):" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Spinner fx:id="nonFoodMarkupSpinner" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                 editable="true">
+            <valueFactory>
+                <SpinnerValueFactory.DoubleSpinnerValueFactory min="0" max="500" initialValue="40" amountToStepBy="5"/>
+            </valueFactory>
+        </Spinner>
+
+        <Label text="Expiration Threshold (days):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Spinner fx:id="expirationThresholdSpinner" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                 editable="true">
+            <valueFactory>
+                <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="30" initialValue="7" amountToStepBy="1"/>
+            </valueFactory>
+        </Spinner>
+
+        <Label text="Expiration Discount (%):" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Spinner fx:id="expirationDiscountSpinner" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                 editable="true">
+            <valueFactory>
+                <SpinnerValueFactory.DoubleSpinnerValueFactory min="0" max="100" initialValue="20" amountToStepBy="5"/>
+            </valueFactory>
+        </Spinner>
+    </GridPane>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#handleCancel"
+                style="-fx-min-width: 80; -fx-pref-width: 80;"/>
+        <Button text="Save" onAction="#handleSave" defaultButton="true"
+                style="-fx-min-width: 80; -fx-pref-width: 80;"/>
+    </HBox>
+</VBox>
