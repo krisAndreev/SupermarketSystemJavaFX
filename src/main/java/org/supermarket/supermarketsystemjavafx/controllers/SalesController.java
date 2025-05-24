@@ -1,5 +1,8 @@
 package org.supermarket.supermarketsystemjavafx.controllers;
 
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -7,20 +10,22 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import org.supermarket.supermarketsystemjavafx.exceptions.DatabaseException;
-import org.supermarket.supermarketsystemjavafx.exceptions.ProductNotFoundException;
-import org.supermarket.supermarketsystemjavafx.models.*;
 import org.supermarket.supermarketsystemjavafx.dao.ProductDAO;
 import org.supermarket.supermarketsystemjavafx.dao.SaleDAO;
+import org.supermarket.supermarketsystemjavafx.exceptions.DatabaseException;
 import org.supermarket.supermarketsystemjavafx.exceptions.InsufficientStockException;
+import org.supermarket.supermarketsystemjavafx.exceptions.ProductNotFoundException;
+import org.supermarket.supermarketsystemjavafx.models.CartItem;
+import org.supermarket.supermarketsystemjavafx.models.Employee;
+import org.supermarket.supermarketsystemjavafx.models.Product;
+import org.supermarket.supermarketsystemjavafx.models.Sale;
 import org.supermarket.supermarketsystemjavafx.services.PricingService;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,23 +47,86 @@ public class SalesController {
     @FXML private Label grandTotalLabel;
     @FXML private Button clearButton;
     @FXML private Button finalizeButton;
+    @FXML private Label employeeInfoLabel;
+    @FXML private Label cashRegisterLabel;
+    @FXML private TextField manualEmployeeIdField;
+    @FXML private HBox manualEntryBox;
 
     // Data
     private ObservableList<CartItem> cartItems = FXCollections.observableArrayList();
     private double grandTotal = 0.0;
     private int totalItems = 0;
-    private int currentCashRegisterId = 1; // Default cash register
-    private int currentEmployeeId = 1; // Default employee
+    private int currentCashRegisterId = 1;
+    private int currentEmployeeId = 1;
+    private Employee currentEmployee;
 
+    public void setEmployee(Employee employee) {
+        this.currentEmployee = employee;
+        updateEmployeeDisplay();
+    }
+
+    @FXML
     public void initialize() {
-        // Configure table columns
-        productIdColumn.setCellValueFactory(new PropertyValueFactory<>("productId"));
-        productNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        unitPriceColumn.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
+        this.currentCashRegisterId = generateCashRegisterId();
+        cashRegisterLabel.setText("Cash Register: #" + currentCashRegisterId);
 
-        // Add remove button to action column
+        // Hide manual entry by default
+        manualEntryBox.setVisible(false);
+
+        configureTableColumns();
+        setupRemoveButtons();
+        setupProductIdListener();
+    }
+
+    private int generateCashRegisterId() {
+        // Simple implementation - could be from config or database
+        return (int) (Math.random() * 1000) + 1;
+    }
+
+    private void updateEmployeeDisplay() {
+        if (currentEmployee != null) {
+            employeeInfoLabel.setText("Employee: " + currentEmployee.getName() +
+                    " (ID: " + currentEmployee.getId() + ")");
+            manualEntryBox.setVisible(false);
+        } else {
+            employeeInfoLabel.setText("No employee selected");
+            manualEntryBox.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void handleManualEmployeeSubmit() {
+        try {
+            int employeeId = Integer.parseInt(manualEmployeeIdField.getText());
+            // In a real app, you would fetch the employee from database here
+            currentEmployee = new Employee(employeeId, "Manual Entry", 0);
+            updateEmployeeDisplay();
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid employee ID");
+        }
+    }
+
+    private void configureTableColumns() {
+        // Solution using lambda expressions instead of PropertyValueFactory
+        productIdColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getProductId()).asObject());
+
+        productNameColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getProductName()));
+
+        unitPriceColumn.setCellValueFactory(cellData ->
+                new SimpleDoubleProperty(cellData.getValue().getUnitPrice()).asObject());
+
+        quantityColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
+
+        totalPriceColumn.setCellValueFactory(cellData ->
+                new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject());
+
+        cartTable.setItems(cartItems);
+    }
+
+    private void setupRemoveButtons() {
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button removeButton = new Button("Remove");
 
@@ -79,22 +147,15 @@ public class SalesController {
                 }
             }
         });
+    }
 
-        cartTable.setItems(cartItems);
-
-        // Add listener to product ID field
+    private void setupProductIdListener() {
         productIdField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty()) {
                 try {
                     int productId = Integer.parseInt(newValue);
                     Product product = ProductDAO.getProductById(productId);
-                    if (product != null) {
-                        productNameLabel.setText(product.getName());
-                        productNameLabel.setStyle("-fx-text-fill: green;");
-                    } else {
-                        productNameLabel.setText("Product not found");
-                        productNameLabel.setStyle("-fx-text-fill: red;");
-                    }
+                    updateProductLabel(product);
                 } catch (NumberFormatException | ProductNotFoundException | DatabaseException e) {
                     productNameLabel.setText("Invalid ID");
                     productNameLabel.setStyle("-fx-text-fill: orange;");
@@ -103,6 +164,16 @@ public class SalesController {
                 productNameLabel.setText("");
             }
         });
+    }
+
+    private void updateProductLabel(Product product) {
+        if (product != null) {
+            productNameLabel.setText(product.getName());
+            productNameLabel.setStyle("-fx-text-fill: green;");
+        } else {
+            productNameLabel.setText("Product not found");
+            productNameLabel.setStyle("-fx-text-fill: red;");
+        }
     }
 
     @FXML
@@ -127,26 +198,7 @@ public class SalesController {
                 return;
             }
 
-            // Check if product already in cart
-            for (CartItem item : cartItems) {
-                if (item.getProductId() == productId) {
-                    item.setQuantity(item.getQuantity() + quantity);
-                    updateTotals();
-                    cartTable.refresh();
-                    clearInputFields();
-                    return;
-                }
-            }
-
-            // Add new item to cart
-            CartItem newItem = new CartItem(
-                    productId,
-                    product.getName(),
-                    product.getSellingPrice(),
-                    quantity
-            );
-
-            cartItems.add(newItem);
+            addOrUpdateCartItem(productId, product, quantity);
             updateTotals();
             clearInputFields();
 
@@ -155,22 +207,34 @@ public class SalesController {
         }
     }
 
+    private void addOrUpdateCartItem(int productId, Product product, int quantity) {
+        for (CartItem item : cartItems) {
+            if (item.getProductId() == productId) {
+                item.setQuantity(item.getQuantity() + quantity);
+                cartTable.refresh();
+                return;
+            }
+        }
+
+        cartItems.add(new CartItem(
+                productId,
+                product.getName(),
+                product.getSellingPrice(),
+                quantity
+        ));
+    }
+
     private void removeFromCart(CartItem item) {
         cartItems.remove(item);
         updateTotals();
     }
 
     private void updateTotals() {
-        totalItems = 0;
-        grandTotal = 0.0;
-
-        for (CartItem item : cartItems) {
-            totalItems += item.getQuantity();
-            grandTotal += item.getTotalPrice();
-        }
+        totalItems = cartItems.stream().mapToInt(CartItem::getQuantity).sum();
+        grandTotal = cartItems.stream().mapToDouble(CartItem::getTotalPrice).sum();
 
         totalItemsLabel.setText(String.valueOf(totalItems));
-        grandTotalLabel.setText(String.format("%.2f", grandTotal));
+        grandTotalLabel.setText(String.format("$%.2f", grandTotal));
     }
 
     @FXML
@@ -187,42 +251,9 @@ public class SalesController {
         }
 
         try {
-            // 1. Validate stock availability
-            Map<Integer, Integer> productQuantities = new HashMap<>();
-            for (CartItem item : cartItems) {
-                productQuantities.put(item.getProductId(), item.getQuantity());
-            }
-
-            // 2. Process sale in database
-            Sale sale = SaleDAO.createSale(
-                    currentCashRegisterId,
-                    currentEmployeeId,
-                    grandTotal,
-                    LocalDateTime.now()
-            );
-
-            // 3. Add sale items and update inventory
-            for (CartItem item : cartItems) {
-                SaleDAO.addSaleItem(
-                        sale.getId(),
-                        item.getProductId(),
-                        item.getQuantity(),
-                        item.getUnitPrice()
-                );
-
-                // Update product quantity in database
-                ProductDAO.updateProductQuantity(
-                        item.getProductId(),
-                        -item.getQuantity() // Subtract from inventory
-                );
-            }
-
-            // 4. Generate receipt
-            generateReceipt(sale);
-
-            // 5. Clear cart
+            processSale();
+            generateAndShowReceipt();
             handleClearCart();
-
         } catch (InsufficientStockException e) {
             showAlert("Insufficient Stock", e.getMessage());
         } catch (Exception e) {
@@ -231,12 +262,45 @@ public class SalesController {
         }
     }
 
-    private void generateReceipt(Sale sale) throws IOException {
+    private void processSale() throws DatabaseException, InsufficientStockException, ProductNotFoundException {
+        // First verify stock for all items
+        for (CartItem item : cartItems) {
+            Product product = ProductDAO.getProductById(item.getProductId());
+            if (product.getQuantity() < item.getQuantity()) {
+                throw new InsufficientStockException("Not enough stock for " + product.getName() +
+                        ". Available: " + product.getQuantity() + ", Requested: " + item.getQuantity());
+            }
+        }
+
+        // Then update inventory
+        for (CartItem item : cartItems) {
+            ProductDAO.updateProductQuantity(
+                    item.getProductId(),
+                    -item.getQuantity()
+            );
+        }
+    }
+
+    private void generateAndShowReceipt() throws IOException {
+        // Create the sale first (moved from processSale)
+        Sale sale;
+        try {
+            sale = SaleDAO.createSale(
+                    currentCashRegisterId,
+                    currentEmployeeId,
+                    grandTotal,
+                    LocalDateTime.now()
+            );
+        } catch (SQLException e) {
+            showAlert("Error", "Failed to create sale record: " + e.getMessage());
+            return;
+        }
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/supermarket/supermarketsystemjavafx/views/Receipt.fxml"));
         Parent root = loader.load();
 
         ReceiptController controller = loader.getController();
-        controller.setSaleData(sale, cartItems);
+        controller.setSaleData(sale, cartItems); // Now passing both required parameters
 
         Stage stage = new Stage();
         stage.setTitle("Receipt - Sale #" + sale.getId());
@@ -259,7 +323,6 @@ public class SalesController {
         alert.showAndWait();
     }
 
-    // Additional methods to set cash register and employee
     public void setCashRegisterId(int cashRegisterId) {
         this.currentCashRegisterId = cashRegisterId;
     }

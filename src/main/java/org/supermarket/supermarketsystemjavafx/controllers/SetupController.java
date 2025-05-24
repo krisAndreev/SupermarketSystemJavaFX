@@ -21,22 +21,22 @@ public class SetupController {
 
         // Set up spinners
         foodMarkupSpinner.setValueFactory(
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 2, config.getFoodMarkupPercent(), 0.01));
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 100, (config.getFoodMarkupPercent()*100), 1));
         nonFoodMarkupSpinner.setValueFactory(
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 2, config.getNonFoodMarkupPercent(), 0.01));
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 100, (config.getNonFoodMarkupPercent()*100), 1));
         expirationThresholdSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, config.getExpirationThresholdDays()));
         expirationDiscountSpinner.setValueFactory(
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1, config.getExpirationDiscountPercent(), 0.01));
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 100, (config.getExpirationDiscountPercent()*100), 1));
     }
 
     @FXML
     private void handleSave() throws DatabaseException {
         PricingConfig newConfig = new PricingConfig(
-                foodMarkupSpinner.getValue(),
-                nonFoodMarkupSpinner.getValue(),
+                (foodMarkupSpinner.getValue()/100),
+                (nonFoodMarkupSpinner.getValue()/100),
                 expirationThresholdSpinner.getValue(),
-                expirationDiscountSpinner.getValue()
+                (expirationDiscountSpinner.getValue()/100)
         );
 
         PricingService.updatePricingConfig(newConfig);

@@ -1,47 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="560.0" prefWidth="800" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.supermarket.supermarketsystemjavafx.controllers.SalesController">
+<VBox xmlns="http://javafx.com/javafx/17.0.2"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="10"
+      prefWidth="800"
+      prefHeight="600"
+      style="-fx-padding: 15;"
+      fx:controller="org.supermarket.supermarketsystemjavafx.controllers.SalesController">
 
-    <!-- Input Section at the Top -->
-    <HBox layoutX="10" layoutY="10" spacing="10">
-        <Label prefHeight="24.0" prefWidth="64.0" style="-fx-font-weight: bold;" text="Product ID:" />
-        <TextField fx:id="productIdField" prefWidth="100" promptText="Enter ID" />
+    <!-- Header Section - Fixed Size -->
+    <Label text="Point of Sale" style="-fx-font-size: 20; -fx-font-weight: bold;"
+           prefWidth="770" prefHeight="30"/>
 
-        <!-- Product Name Display -->
-        <Label fx:id="productNameLabel" maxWidth="200" minWidth="200" prefHeight="23.0" prefWidth="200.0" style="-fx-font-style: italic; -fx-text-fill: #555;" text="" wrapText="true" />
+    <Separator prefWidth="770"/>
 
-        <Label prefHeight="24.0" prefWidth="53.0" style="-fx-font-weight: bold;" text="Quantity:" />
-        <TextField fx:id="quantityField" prefWidth="100" promptText="Enter Qty" />
+    <!-- Product Entry Section - Fixed Size -->
+    <HBox spacing="10" alignment="CENTER_LEFT" prefWidth="770" prefHeight="40">
+        <Label text="Product ID:" style="-fx-font-weight: bold;" prefWidth="70"/>
+        <TextField fx:id="productIdField" promptText="Scan or enter product ID"
+                   prefWidth="150" prefHeight="30"/>
+        <Label fx:id="productNameLabel" prefWidth="200" prefHeight="30"
+               style="-fx-text-fill: green; -fx-alignment: CENTER_LEFT;"/>
+        <Label text="Quantity:" style="-fx-font-weight: bold;" prefWidth="60"/>
+        <TextField fx:id="quantityField" promptText="Qty" prefWidth="50" prefHeight="30"/>
+        <Button fx:id="addButton" text="Add to Cart" onAction="#handleAddProduct"
+                prefWidth="100" prefHeight="30"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
     </HBox>
 
-    <!-- Rest of the layout remains the same -->
-    <TableView fx:id="cartTable" layoutX="10" layoutY="60" prefHeight="400" prefWidth="780">
+    <Separator prefWidth="770"/>
+
+    <!-- Cart Table Section - Fixed Size -->
+    <TableView fx:id="cartTable" prefWidth="770" prefHeight="300" fixedCellSize="30">
         <columns>
-            <TableColumn fx:id="productIdColumn" prefWidth="80" text="ID" />
-            <TableColumn fx:id="productNameColumn" prefWidth="200" text="Product Name" />
-            <TableColumn fx:id="unitPriceColumn" prefWidth="100" text="Unit Price" />
-            <TableColumn fx:id="quantityColumn" prefWidth="80" text="Qty" />
-            <TableColumn fx:id="totalPriceColumn" prefWidth="100" text="Total" />
-            <TableColumn fx:id="actionColumn" prefWidth="120" text="Action" />
+            <TableColumn fx:id="productIdColumn" text="ID" prefWidth="50" resizable="false"/>
+            <TableColumn fx:id="productNameColumn" text="Product" prefWidth="200" resizable="false"/>
+            <TableColumn fx:id="unitPriceColumn" text="Unit Price" prefWidth="80" resizable="false">
+                <style><![CDATA[
+                    -fx-alignment: CENTER_RIGHT;
+                ]]></style>
+            </TableColumn>
+            <TableColumn fx:id="quantityColumn" text="Qty" prefWidth="50" resizable="false"/>
+            <TableColumn fx:id="totalPriceColumn" text="Total" prefWidth="80" resizable="false">
+                <style><![CDATA[
+                    -fx-alignment: CENTER_RIGHT;
+                ]]></style>
+            </TableColumn>
+            <TableColumn fx:id="actionColumn" text="Action" prefWidth="80" resizable="false"/>
         </columns>
     </TableView>
 
-    <HBox layoutX="10" layoutY="470" spacing="20">
-        <Label style="-fx-font-weight: bold;" text="Total Items:" />
-        <Label fx:id="totalItemsLabel" text="0" />
+    <!-- Footer Section - Fixed Size -->
+    <HBox spacing="20" alignment="CENTER_LEFT" prefWidth="770" prefHeight="50">
+        <!-- Action Buttons - Fixed Size -->
+        <HBox spacing="10" alignment="CENTER_LEFT" prefWidth="250">
+            <Button fx:id="clearButton" text="Clear Cart" onAction="#handleClearCart"
+                    prefWidth="100" prefHeight="30"
+                    style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+            <Button fx:id="finalizeButton" text="Finalize Sale" onAction="#handleFinalizeOrder"
+                    prefWidth="120" prefHeight="30"
+                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
 
-        <Label style="-fx-font-weight: bold;" text="Grand Total:" />
-        <Label fx:id="grandTotalLabel" text="0.00" />
+        <!-- Totals Display - Fixed Size -->
+        <VBox alignment="CENTER_RIGHT" spacing="5" prefWidth="250">
+            <HBox spacing="10" prefWidth="250">
+                <Label text="Total Items:" style="-fx-font-weight: bold;" prefWidth="80"/>
+                <Label fx:id="totalItemsLabel" text="0" style="-fx-font-weight: bold;" prefWidth="50"/>
+            </HBox>
+            <HBox spacing="10" prefWidth="250">
+                <Label text="Grand Total:" style="-fx-font-weight: bold; -fx-font-size: 14;" prefWidth="80"/>
+                <Label fx:id="grandTotalLabel" text="\$0.00" prefWidth="100"
+                       style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #2196F3;"/>
+            </HBox>
+        </VBox>
+
+        <!-- System Info Section - Fixed Size -->
+        <VBox alignment="CENTER_RIGHT" spacing="5" prefWidth="270">
+            <HBox spacing="5" prefWidth="270">
+                <Label text="Cash Register:" style="-fx-font-weight: bold; -fx-font-size: 12;" prefWidth="90"/>
+                <Label fx:id="cashRegisterLabel" text="#000" style="-fx-font-size: 12;" prefWidth="50"/>
+            </HBox>
+            <HBox spacing="5" prefWidth="270">
+                <Label text="Employee:" style="-fx-font-weight: bold; -fx-font-size: 12;" prefWidth="60"/>
+                <Label fx:id="employeeInfoLabel" text="Not assigned" style="-fx-font-size: 12;" prefWidth="150"/>
+            </HBox>
+            <HBox fx:id="manualEntryBox" spacing="5" visible="false" prefWidth="270">
+                <TextField fx:id="manualEmployeeIdField" promptText="Emp ID" prefWidth="60" prefHeight="25"/>
+                <Button text="Set" onAction="#handleManualEmployeeSubmit"
+                        prefWidth="40" prefHeight="25"
+                        style="-fx-font-size: 11; -fx-padding: 2 5 2 5;"/>
+            </HBox>
+        </VBox>
     </HBox>
 
-    <HBox layoutX="10" layoutY="510" spacing="10">
-        <Button fx:id="clearButton" onAction="#handleClearCart" text="Clear Cart" />
-        <Button fx:id="finalizeButton" onAction="#handleFinalizeOrder" text="Finalize Order" />
-    </HBox>
-
-     <Button fx:id="addButton" layoutX="707.0" layoutY="10.0" onAction="#handleAddProduct" text="Add Product" />
-
-</AnchorPane>
+</VBox>

@@ -9,6 +9,7 @@ import org.supermarket.supermarketsystemjavafx.models.Product;
 import org.supermarket.supermarketsystemjavafx.services.PricingService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class AddItemController {
     @FXML private TextField nameField;
@@ -17,6 +18,8 @@ public class AddItemController {
     @FXML private DatePicker expirationDatePicker;
     @FXML private TextField quantityField;
     @FXML private TextField barcodeField;
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML
     public void initialize() {

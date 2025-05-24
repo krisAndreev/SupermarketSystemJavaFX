@@ -309,9 +309,17 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void sellButtonClicked() throws IOException {
+        Employee selectedEmployee = employeesTable.getSelectionModel().getSelectedItem();
+
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/org/supermarket/supermarketsystemjavafx/SalesWindow.fxml")
         );
+
+        SalesController salesController = loader.getController();
+        if (selectedEmployee != null) {
+            salesController.setEmployee(selectedEmployee);
+        }
+
         openWindow(loader, "Sales Management", salesButton, 0);
     }
 
