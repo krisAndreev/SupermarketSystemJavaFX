@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.supermarket.supermarketsystemjavafx.dao.ProductDAO;
 import org.supermarket.supermarketsystemjavafx.dao.SaleDAO;
@@ -24,6 +25,7 @@ import org.supermarket.supermarketsystemjavafx.models.Sale;
 import org.supermarket.supermarketsystemjavafx.services.PricingService;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -251,14 +253,58 @@ public class SalesController {
         }
 
         try {
-            processSale();
-            generateAndShowReceipt();
+            // First create the sale and get its ID
+            int saleId = createSaleRecord();
+
+            // Then add all sale items
+            addSaleItems(saleId);
+
+            // Now generate receipt with the sale ID
+            generateAndShowReceipt(saleId);
+
+            // Finally clear the cart
             handleClearCart();
+
         } catch (InsufficientStockException e) {
             showAlert("Insufficient Stock", e.getMessage());
         } catch (Exception e) {
             showAlert("Error", "Failed to process sale: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private int createSaleRecord() throws DatabaseException, SQLException {
+        // Create and return the sale record
+        Sale sale = SaleDAO.createSale(
+                currentCashRegisterId,
+                currentEmployeeId,
+                grandTotal,
+                LocalDateTime.now()
+        );
+        return sale.getId();
+    }
+
+    private void addSaleItems(int saleId) throws DatabaseException, InsufficientStockException, ProductNotFoundException, SQLException {
+        // Verify stock and add items
+        for (CartItem item : cartItems) {
+            Product product = ProductDAO.getProductById(item.getProductId());
+            if (product.getQuantity() < item.getQuantity()) {
+                throw new InsufficientStockException("Not enough stock for " + product.getName() +
+                        ". Available: " + product.getQuantity() + ", Requested: " + item.getQuantity());
+            }
+
+            SaleDAO.addSaleItem(
+                    saleId,
+                    item.getProductId(),
+                    item.getQuantity(),
+                    item.getUnitPrice()
+            );
+
+            // Update inventory
+            ProductDAO.updateProductQuantity(
+                    item.getProductId(),
+                    -item.getQuantity()
+            );
         }
     }
 
@@ -281,31 +327,55 @@ public class SalesController {
         }
     }
 
-    private void generateAndShowReceipt() throws IOException {
-        // Create the sale first (moved from processSale)
-        Sale sale;
+    // In SalesController.java
+    private void generateAndShowReceipt(int saleId) {
         try {
-            sale = SaleDAO.createSale(
-                    currentCashRegisterId,
-                    currentEmployeeId,
-                    grandTotal,
-                    LocalDateTime.now()
-            );
-        } catch (SQLException e) {
-            showAlert("Error", "Failed to create sale record: " + e.getMessage());
-            return;
+            // Load the receipt FXML file with proper path resolution
+            FXMLLoader loader = new FXMLLoader();
+            URL fxmlLocation = getClass().getResource("/org/supermarket/supermarketsystemjavafx/Receipt.fxml");
+
+            if (fxmlLocation == null) {
+                throw new IOException("Cannot find receipt.fxml in the specified path");
+            }
+
+            loader.setLocation(fxmlLocation);
+            Parent root = loader.load();
+
+            // Get the controller and pass the sale ID
+            ReceiptController controller = loader.getController();
+            controller.setSaleData(saleId);
+
+            // Show the receipt window
+            Stage stage = new Stage();
+            stage.setTitle("Receipt");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.resizableProperty().setValue(Boolean.FALSE);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Could not generate receipt");
+            alert.setContentText("Failed to load receipt view: " + e.getMessage());
+            alert.showAndWait();
         }
+    }
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/supermarket/supermarketsystemjavafx/views/Receipt.fxml"));
+    private void openWindow(FXMLLoader loader, String title, Button ownerButton) throws IOException {
         Parent root = loader.load();
-
-        ReceiptController controller = loader.getController();
-        controller.setSaleData(sale, cartItems); // Now passing both required parameters
-
         Stage stage = new Stage();
-        stage.setTitle("Receipt - Sale #" + sale.getId());
+        stage.setTitle(title);
         stage.setScene(new Scene(root));
-        stage.show();
+        stage.initOwner(ownerButton.getScene().getWindow());
+        stage.resizableProperty().setValue(Boolean.FALSE);
+
+//        switch (functionKey) {
+//            case 1: stage.setOnHidden(e -> refreshProducts()); break;
+//            case 2: stage.setOnHidden(e -> refreshEmployees()); break;
+//            default: break;
+//        }
+        stage.showAndWait();
     }
 
     private void clearInputFields() {

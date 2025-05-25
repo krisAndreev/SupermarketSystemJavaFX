@@ -375,6 +375,7 @@ public class DashboardController implements Initializable {
         stage.setTitle(title);
         stage.setScene(new Scene(root));
         stage.initOwner(ownerButton.getScene().getWindow());
+        stage.resizableProperty().setValue(Boolean.FALSE);
 
         switch (functionKey) {
             case 1: stage.setOnHidden(e -> refreshProducts()); break;

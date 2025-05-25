@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="600" prefWidth="400" spacing="10" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.supermarket.supermarketsystemjavafx.controllers.ReceiptController">
+
+    <!-- Header -->
+    <Label prefWidth="360" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-alignment: CENTER;" text="SUPERMARKET RECEIPT" />
+    <Separator prefWidth="360" />
+
+    <!-- Sale Info -->
+    <GridPane hgap="10" prefWidth="360" vgap="5">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" prefWidth="150" />
+            <ColumnConstraints halignment="LEFT" prefWidth="210" />
+        </columnConstraints>
+
+        <Label style="-fx-font-weight: bold;" text="Receipt #:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <Label fx:id="saleIdLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label style="-fx-font-weight: bold;" text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <Label fx:id="dateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label style="-fx-font-weight: bold;" text="Cash Register:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Label fx:id="cashRegisterLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label style="-fx-font-weight: bold;" text="Employee:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <Label fx:id="employeeLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+
+    <Separator prefWidth="360" />
+
+    <!-- Items Header -->
+    <HBox prefWidth="360" spacing="10">
+        <Label prefWidth="180" style="-fx-font-weight: bold;" text="Item" />
+        <Label alignment="CENTER_RIGHT" prefWidth="50" style="-fx-font-weight: bold;" text="Qty" />
+        <Label alignment="CENTER_RIGHT" prefWidth="60" style="-fx-font-weight: bold;" text="Price" />
+        <Label alignment="CENTER_RIGHT" prefWidth="70" style="-fx-font-weight: bold;" text="Total" />
+    </HBox>
+
+    <!-- Items List -->
+    <VBox fx:id="itemsContainer" prefWidth="360" spacing="5" />
+
+    <Separator prefWidth="360" />
+
+    <!-- Totals -->
+    <VBox alignment="TOP_RIGHT" prefWidth="360" spacing="5">
+        <HBox spacing="10">
+            <Label prefWidth="180" style="-fx-font-weight: bold;" text="Subtotal:" />
+            <Label fx:id="subtotalLabel" alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="173.0" />
+        </HBox>
+        <HBox spacing="10">
+            <Label prefWidth="180" style="-fx-font-weight: bold;" text="Discount:" />
+            <Label fx:id="discountLabel" alignment="CENTER_RIGHT" prefHeight="17.0" prefWidth="170.0" />
+        </HBox>
+        <HBox spacing="10">
+            <Label prefWidth="180" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Grand Total:" />
+            <Label fx:id="grandTotalLabel" alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="176.0" style="-fx-font-weight: bold; -fx-font-size: 14;" />
+        </HBox>
+    </VBox>
+
+    <!-- Footer -->
+    <Separator prefWidth="360" />
+    <Label prefWidth="360" style="-fx-font-style: italic; -fx-alignment: CENTER;" text="Thank you for shopping with us!" />
+    <Label prefWidth="360" style="-fx-font-size: 10; -fx-alignment: CENTER;" text="Returns accepted within 7 days with receipt" />
+</VBox>
